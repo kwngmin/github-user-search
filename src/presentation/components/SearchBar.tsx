@@ -2,35 +2,35 @@
  * 검색바 컴포넌트
  * - 기본 검색어 입력
  * - 검색 실행
+ * - useSearch 커스텀 훅 사용
  */
 
 'use client';
 
-import React, { useState } from 'react';
-import { TextField, Button, Paper } from '@mui/material';
+import React from 'react';
+import { TextField, Button, Paper, CircularProgress } from '@mui/material';
 import SearchIcon from '@mui/icons-material/Search';
-import { useAppDispatch } from '@/presentation/store';
-import {
-  updateFilters,
-  resetSearch,
-  searchUsers,
-} from '@/presentation/store/search-slice';
+import ClearIcon from '@mui/icons-material/Clear';
+import { useSearch } from '@/presentation/store/use-search';
 
 export default function SearchBar() {
-  const dispatch = useAppDispatch();
-  const [query, setQuery] = useState('');
+  const { searchQuery, loading, canSearch, setSearchQuery, search, resetAll } =
+    useSearch();
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!query.trim()) return;
+    if (!canSearch) return;
 
-    // 검색 초기화 및 필터 업데이트
-    dispatch(resetSearch());
-    dispatch(updateFilters({ query: query.trim() }));
+    try {
+      await search();
+    } catch (error) {
+      console.error('Search failed:', error);
+    }
+  };
 
-    // 검색 실행
-    await dispatch(searchUsers({ query: query.trim(), page: 1, perPage: 30 }));
+  const handleClear = () => {
+    resetAll();
   };
 
   return (
@@ -42,28 +42,46 @@ export default function SearchBar() {
     >
       <TextField
         fullWidth
-        value={query}
-        onChange={e => setQuery(e.target.value)}
-        placeholder="Search GitHub users..."
+        value={searchQuery}
+        onChange={e => setSearchQuery(e.target.value)}
+        placeholder="Search GitHub users... (e.g., react, typescript, Seoul)"
         variant="outlined"
         size="medium"
+        disabled={loading}
         sx={{
           '& .MuiOutlinedInput-root': {
             borderRadius: 2,
           },
         }}
       />
+
+      {searchQuery && (
+        <Button
+          onClick={handleClear}
+          variant="outlined"
+          size="large"
+          disabled={loading}
+          sx={{
+            minWidth: 60,
+            borderRadius: 2,
+          }}
+        >
+          <ClearIcon />
+        </Button>
+      )}
+
       <Button
         type="submit"
         variant="contained"
         size="large"
-        startIcon={<SearchIcon />}
+        disabled={!canSearch}
+        startIcon={loading ? <CircularProgress size={20} /> : <SearchIcon />}
         sx={{
           minWidth: 120,
           borderRadius: 2,
         }}
       >
-        Search
+        {loading ? 'Searching...' : 'Search'}
       </Button>
     </Paper>
   );

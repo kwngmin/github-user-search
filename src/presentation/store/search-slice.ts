@@ -1,7 +1,8 @@
 /**
  * Redux Toolkit 검색 슬라이스
- * - 검색 상태 관리
+ * - 검색 상태 관리 (searchQuery, filters, users, loading, error)
  * - 비동기 검색 액션
+ * - 무한 스크롤 지원
  */
 
 import { createSlice, createAsyncThunk, PayloadAction } from '@reduxjs/toolkit';
@@ -12,30 +13,37 @@ import { SearchFilters } from '@/domain/types/filters';
  * 검색 상태 인터페이스
  */
 interface SearchState {
+  // 검색어 (사용자 입력)
+  searchQuery: string;
+
+  // 검색 필터 (8가지 필터 옵션)
+  filters: SearchFilters;
+
   // 검색 결과
   users: GitHubUser[];
   metadata: SearchMetadata | null;
 
-  // 현재 필터
-  filters: SearchFilters;
+  // 로딩 상태
+  loading: boolean;
 
-  // UI 상태
-  isLoading: boolean;
+  // 에러 상태
   error: string | null;
 
-  // Rate Limit
+  // Rate Limit 정보
   rateLimit: RateLimit | null;
 
-  // 무한 스크롤
+  // 무한 스크롤 상태
   hasMore: boolean;
+
+  // 검색 실행 여부 (검색 버튼 클릭 전/후 구분)
+  isSearched: boolean;
 }
 
 /**
  * 초기 상태
  */
 const initialState: SearchState = {
-  users: [],
-  metadata: null,
+  searchQuery: '',
   filters: {
     query: '',
     page: 1,
@@ -43,10 +51,13 @@ const initialState: SearchState = {
     sort: 'best-match',
     sortOrder: 'desc',
   },
-  isLoading: false,
+  users: [],
+  metadata: null,
+  loading: false,
   error: null,
   rateLimit: null,
   hasMore: true,
+  isSearched: false,
 };
 
 /**
@@ -70,10 +81,26 @@ export const searchUsers = createAsyncThunk(
         return rejectWithValue(error.message || 'Search failed');
       }
 
-      return await response.json();
+      const data = await response.json();
+
+      // Rate Limit 헤더 추출
+      const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+      const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
+      const rateLimitReset = response.headers.get('X-RateLimit-Reset');
+
+      return {
+        ...data,
+        rateLimitInfo: rateLimitRemaining
+          ? {
+              remaining: parseInt(rateLimitRemaining, 10),
+              limit: rateLimitLimit ? parseInt(rateLimitLimit, 10) : 0,
+              reset: rateLimitReset ? parseInt(rateLimitReset, 10) : 0,
+            }
+          : null,
+      };
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? error.message : 'Unknown error occurred'
       );
     }
   }
@@ -96,7 +123,50 @@ export const fetchRateLimit = createAsyncThunk(
       return await response.json();
     } catch (error) {
       return rejectWithValue(
-        error instanceof Error ? error.message : 'Unknown error'
+        error instanceof Error ? error.message : 'Unknown error occurred'
+      );
+    }
+  }
+);
+
+/**
+ * 비동기 액션: 다음 페이지 로드 (무한 스크롤)
+ */
+export const loadMoreUsers = createAsyncThunk(
+  'search/loadMoreUsers',
+  async (_, { getState, rejectWithValue }) => {
+    const state = getState() as { search: SearchState };
+    const { filters, hasMore, loading } = state.search;
+
+    // 이미 로딩 중이거나 더 이상 페이지가 없으면 중단
+    if (loading || !hasMore) {
+      return rejectWithValue('No more data or already loading');
+    }
+
+    // 다음 페이지 번호로 검색
+    const nextPageFilters = {
+      ...filters,
+      page: (filters.page || 1) + 1,
+    };
+
+    try {
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(nextPageFilters),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        return rejectWithValue(error.message || 'Failed to load more users');
+      }
+
+      return await response.json();
+    } catch (error) {
+      return rejectWithValue(
+        error instanceof Error ? error.message : 'Unknown error occurred'
       );
     }
   }
@@ -109,7 +179,12 @@ const searchSlice = createSlice({
   name: 'search',
   initialState,
   reducers: {
-    // 필터 업데이트
+    // 검색어 업데이트 (입력창 onChange)
+    setSearchQuery: (state, action: PayloadAction<string>) => {
+      state.searchQuery = action.payload;
+    },
+
+    // 필터 업데이트 (개별 필터 변경)
     updateFilters: (state, action: PayloadAction<Partial<SearchFilters>>) => {
       state.filters = { ...state.filters, ...action.payload };
 
@@ -117,11 +192,35 @@ const searchSlice = createSlice({
       if (
         action.payload.query !== undefined ||
         action.payload.type !== undefined ||
-        action.payload.sort !== undefined
+        action.payload.sort !== undefined ||
+        action.payload.sortOrder !== undefined
       ) {
         state.filters.page = 1;
         state.users = [];
+        state.hasMore = true;
       }
+    },
+
+    // 필터 일괄 업데이트
+    setFilters: (state, action: PayloadAction<SearchFilters>) => {
+      state.filters = action.payload;
+      state.users = [];
+      state.hasMore = true;
+    },
+
+    // 정렬 옵션 변경
+    setSortOption: (
+      state,
+      action: PayloadAction<{
+        sort: SearchFilters['sort'];
+        sortOrder: SearchFilters['sortOrder'];
+      }>
+    ) => {
+      state.filters.sort = action.payload.sort;
+      state.filters.sortOrder = action.payload.sortOrder;
+      state.filters.page = 1;
+      state.users = [];
+      state.hasMore = true;
     },
 
     // 검색 초기화
@@ -131,22 +230,34 @@ const searchSlice = createSlice({
       state.error = null;
       state.hasMore = true;
       state.filters.page = 1;
+      state.isSearched = false;
+    },
+
+    // 전체 상태 초기화 (검색어 포함)
+    resetAll: state => {
+      return { ...initialState };
     },
 
     // 에러 클리어
     clearError: state => {
       state.error = null;
     },
+
+    // 페이지 증가 (무한 스크롤용)
+    incrementPage: state => {
+      state.filters.page = (state.filters.page || 1) + 1;
+    },
   },
   extraReducers: builder => {
     // searchUsers 액션 처리
     builder
       .addCase(searchUsers.pending, state => {
-        state.isLoading = true;
+        state.loading = true;
         state.error = null;
       })
       .addCase(searchUsers.fulfilled, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
+        state.isSearched = true;
 
         // 첫 페이지면 교체, 아니면 추가 (무한 스크롤)
         if (state.filters.page === 1) {
@@ -157,19 +268,71 @@ const searchSlice = createSlice({
 
         state.metadata = action.payload.metadata;
         state.hasMore = action.payload.metadata.hasNextPage;
+
+        // Rate Limit 정보 업데이트
+        if (action.payload.rateLimitInfo) {
+          state.rateLimit = {
+            ...action.payload.rateLimitInfo,
+            used:
+              action.payload.rateLimitInfo.limit -
+              action.payload.rateLimitInfo.remaining,
+          };
+        }
       })
       .addCase(searchUsers.rejected, (state, action) => {
-        state.isLoading = false;
+        state.loading = false;
+        state.error = action.payload as string;
+        state.hasMore = false;
+        state.isSearched = true;
+      });
+
+    // loadMoreUsers 액션 처리 (무한 스크롤)
+    builder
+      .addCase(loadMoreUsers.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(loadMoreUsers.fulfilled, (state, action) => {
+        state.loading = false;
+
+        // 기존 사용자 목록에 추가
+        state.users = [...state.users, ...action.payload.users];
+        state.metadata = action.payload.metadata;
+        state.hasMore = action.payload.metadata.hasNextPage;
+
+        // 페이지 번호 증가
+        state.filters.page = (state.filters.page || 1) + 1;
+      })
+      .addCase(loadMoreUsers.rejected, (state, action) => {
+        state.loading = false;
         state.error = action.payload as string;
         state.hasMore = false;
       });
 
     // fetchRateLimit 액션 처리
-    builder.addCase(fetchRateLimit.fulfilled, (state, action) => {
-      state.rateLimit = action.payload;
-    });
+    builder
+      .addCase(fetchRateLimit.pending, state => {
+        // Rate Limit 조회는 백그라운드에서 실행되므로 loading 상태 변경 안함
+      })
+      .addCase(fetchRateLimit.fulfilled, (state, action) => {
+        state.rateLimit = action.payload;
+      })
+      .addCase(fetchRateLimit.rejected, (state, action) => {
+        // Rate Limit 조회 실패는 조용히 처리
+        console.error('Failed to fetch rate limit:', action.payload);
+      });
   },
 });
 
-export const { updateFilters, resetSearch, clearError } = searchSlice.actions;
+export const {
+  setSearchQuery,
+  updateFilters,
+  setFilters,
+  setSortOption,
+  resetSearch,
+  resetAll,
+  clearError,
+  incrementPage,
+} = searchSlice.actions;
+
 export default searchSlice.reducer;

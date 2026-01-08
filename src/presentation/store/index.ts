@@ -14,7 +14,10 @@ export const store = configureStore({
     getDefaultMiddleware({
       serializableCheck: {
         // Date 객체 등을 허용
-        ignoredActions: ['search/searchUsers/fulfilled'],
+        ignoredActions: [
+          'search/searchUsers/fulfilled',
+          'search/loadMoreUsers/fulfilled',
+        ],
         ignoredPaths: ['search.metadata.timestamp'],
       },
     }),
@@ -29,3 +32,7 @@ import { TypedUseSelectorHook, useDispatch, useSelector } from 'react-redux';
 
 export const useAppDispatch: () => AppDispatch = useDispatch;
 export const useAppSelector: TypedUseSelectorHook<RootState> = useSelector;
+
+// Selectors와 커스텀 훅 re-export
+export * from './search-selectors';
+export { useSearch } from './use-search';
