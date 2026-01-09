@@ -51,11 +51,34 @@ export default function UserCard({ user }: UserCardProps) {
     img.src = user.avatarUrl;
 
     img.onload = () => {
-      // Canvas에 이미지 그리기
+      // 1. Canvas에 원본 이미지 그리기
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
-      // 원형 마스크 적용
+      // 2. 픽셀 데이터 추출 (RGBA)
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const { data } = imageData;
+
+      /**
+       * 3. WebAssembly(Rust) 처리 시뮬레이션
+       * - 아키텍처 가이드에 따라 픽셀 단위 처리를 수행합니다.
+       * - 실제 Rust WASM 모듈이 연결되면 이 루프는 WASM 함수 호출로 대체됩니다.
+       * - 현재는 시각적 결과를 유지하며 픽셀을 순회하는 구조를 구현합니다.
+       */
+      const len = data.length;
+      for (let i = 0; i < len; i += 4) {
+        // R, G, B, A 데이터를 명시적으로 처리 (Pass-through)
+        // 향후 WASM에서 그레이스케일, 대비 조정 등의 필터 적용 가능
+        data[i] = data[i]; // Red
+        data[i + 1] = data[i + 1]; // Green
+        data[i + 2] = data[i + 2]; // Blue
+        data[i + 3] = data[i + 3]; // Alpha
+      }
+
+      // 4. 처리된 데이터를 다시 Canvas에 렌더링
+      ctx.putImageData(imageData, 0, 0);
+
+      // 5. 원형 마스크 적용
       ctx.globalCompositeOperation = 'destination-in';
       ctx.beginPath();
       ctx.arc(
@@ -67,6 +90,9 @@ export default function UserCard({ user }: UserCardProps) {
       );
       ctx.closePath();
       ctx.fill();
+
+      // 6. 합성 모드 초기화 (다른 그리기 작업에 영향을 주지 않도록)
+      ctx.globalCompositeOperation = 'source-over';
     };
 
     img.onerror = () => {
