@@ -27,7 +27,7 @@ export const selectIsSearched = (state: RootState) => state.search.isSearched;
 // 검색 결과 개수
 export const selectUsersCount = createSelector(
   [selectUsers],
-  users => users.length
+  users => users?.length || 0
 );
 
 // 전체 결과 개수
@@ -69,7 +69,10 @@ export const selectRateLimitResetDate = createSelector(
 // 검색 실행 가능 여부
 export const selectCanSearch = createSelector(
   [selectSearchQuery, selectLoading],
-  (query, loading) => query.trim().length > 0 && !loading
+  (query, loading) => {
+    if (!query) return false;
+    return query.trim().length > 0 && !loading;
+  }
 );
 
 // 무한 스크롤 트리거 가능 여부
@@ -82,6 +85,8 @@ export const selectCanLoadMore = createSelector(
 export const selectActiveFiltersCount = createSelector(
   [selectFilters],
   filters => {
+    if (!filters) return 0;
+
     let count = 0;
     if (filters.type) count++;
     if (filters.searchIn && filters.searchIn.length > 0) count++;
@@ -108,7 +113,7 @@ export const selectSearchResultState = createSelector(
     if (loading) return 'loading';
     if (error) return 'error';
     if (!isSearched) return 'initial';
-    if (users.length === 0) return 'empty';
+    if (!users || users.length === 0) return 'empty';
     return 'success';
   }
 );

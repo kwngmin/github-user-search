@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { Noto_Sans } from 'next/font/google';
 import './globals.css';
-import ReduxProvider from '@/providers/redux-provider';
 import AppThemeProvider from '@/lib/theme-provider';
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v15-appRouter';
+import ReduxProvider from '@/presentation/store/providers/redux-provider';
 
 const notoSans = Noto_Sans({
   weight: ['400', '500', '700'],

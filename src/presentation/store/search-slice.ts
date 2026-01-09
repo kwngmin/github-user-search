@@ -67,8 +67,10 @@ export const searchUsers = createAsyncThunk(
   'search/searchUsers',
   async (filters: SearchFilters, { rejectWithValue }) => {
     try {
-      // 서버 라우트로 요청 (/api/search)
-      const response = await fetch('/api/search', {
+      console.log('[searchUsers] Calling API with filters:', filters);
+
+      // 서버 라우트로 요청 (/api/search/users)
+      const response = await fetch('/api/search/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -76,12 +78,16 @@ export const searchUsers = createAsyncThunk(
         body: JSON.stringify(filters),
       });
 
+      console.log('[searchUsers] Response status:', response.status);
+
       if (!response.ok) {
         const error = await response.json();
-        return rejectWithValue(error.message || 'Search failed');
+        console.error('[searchUsers] API Error:', error);
+        return rejectWithValue(error.error || error.message || 'Search failed');
       }
 
       const data = await response.json();
+      console.log('[searchUsers] Success, users count:', data.users?.length);
 
       // Rate Limit 헤더 추출
       const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
@@ -99,6 +105,7 @@ export const searchUsers = createAsyncThunk(
           : null,
       };
     } catch (error) {
+      console.error('[searchUsers] Exception:', error);
       return rejectWithValue(
         error instanceof Error ? error.message : 'Unknown error occurred'
       );
@@ -150,7 +157,7 @@ export const loadMoreUsers = createAsyncThunk(
     };
 
     try {
-      const response = await fetch('/api/search', {
+      const response = await fetch('/api/search/users', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -160,7 +167,9 @@ export const loadMoreUsers = createAsyncThunk(
 
       if (!response.ok) {
         const error = await response.json();
-        return rejectWithValue(error.message || 'Failed to load more users');
+        return rejectWithValue(
+          error.error || error.message || 'Failed to load more users'
+        );
       }
 
       return await response.json();
@@ -182,6 +191,8 @@ const searchSlice = createSlice({
     // 검색어 업데이트 (입력창 onChange)
     setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
+      // filters.query도 함께 업데이트 (동기화)
+      state.filters.query = action.payload;
     },
 
     // 필터 업데이트 (개별 필터 변경)

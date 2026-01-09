@@ -1,44 +1,58 @@
+/**
+ * MUI 테마 프로바이더
+ * - 다크모드 자동 감지 및 적용
+ * - Tailwind CSS dark: 클래스와 동기화
+ */
+
 'use client';
 
-import { ThemeProvider, CssBaseline } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { createAppTheme } from '@/lib/theme';
+import { ThemeProvider as MuiThemeProvider } from '@mui/material/styles';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ReactNode, useEffect, useState } from 'react';
+import { lightTheme, darkTheme } from './theme';
 
-export default function AppThemeProvider({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const [mode, setMode] = useState<'light' | 'dark'>('light');
+interface ThemeProviderProps {
+  children: ReactNode;
+}
+
+export default function ThemeProvider({ children }: ThemeProviderProps) {
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   useEffect(() => {
-    // 시스템 다크모드 감지
+    // 초기 다크모드 감지
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
-    setMode(mediaQuery.matches ? 'dark' : 'light');
+    setIsDarkMode(mediaQuery.matches);
 
-    const handleChange = (e: MediaQueryListEvent) => {
-      setMode(e.matches ? 'dark' : 'light');
-    };
-
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
-  const theme = createAppTheme(mode);
-
-  // Tailwind dark 모드와 동기화
-  useEffect(() => {
-    if (mode === 'dark') {
+    // Tailwind CSS와 동기화
+    if (mediaQuery.matches) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
-  }, [mode]);
+
+    // 시스템 테마 변경 감지
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDarkMode(e.matches);
+
+      // Tailwind CSS와 동기화
+      if (e.matches) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+
+    return () => {
+      mediaQuery.removeEventListener('change', handleChange);
+    };
+  }, []);
 
   return (
-    <ThemeProvider theme={theme}>
+    <MuiThemeProvider theme={isDarkMode ? darkTheme : lightTheme}>
       <CssBaseline />
       {children}
-    </ThemeProvider>
+    </MuiThemeProvider>
   );
 }

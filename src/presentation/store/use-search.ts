@@ -99,10 +99,19 @@ export function useSearch() {
 
   const handleSearch = useCallback(
     async (customFilters?: Partial<SearchFilters>) => {
+      // query 우선순위 명확화
+      const finalQuery = customFilters?.query || filters.query || searchQuery;
+
+      // 빈 query 체크
+      if (!finalQuery || finalQuery.trim().length === 0) {
+        console.warn('Search query is empty');
+        return; // ← 빈 query면 중단
+      }
+
       const searchFilters = {
         ...filters,
         ...customFilters,
-        query: customFilters?.query || searchQuery,
+        query: finalQuery,
         page: 1,
       };
 
