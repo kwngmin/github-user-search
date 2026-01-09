@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import SearchPage from '@/presentation/pages/SearchPage';
 import { GitHubApiClient } from '@/lib/github-api-client';
 import ReduxProvider from '@/presentation/store/providers/redux-provider';
