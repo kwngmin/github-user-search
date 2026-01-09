@@ -19,7 +19,7 @@ export async function GET(request: NextRequest) {
     const client = new GitHubApiClient();
 
     // 2. Rate Limit 정보 조회
-    const rateLimit = await client.getRateLimit();
+    const { data: rateLimit } = await client.getRateLimit();
 
     // 3. 성공 응답 반환
     return NextResponse.json(rateLimit, {

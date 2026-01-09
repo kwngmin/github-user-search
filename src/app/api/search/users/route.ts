@@ -31,14 +31,20 @@ export async function POST(request: NextRequest) {
     const client = new GitHubApiClient();
 
     // 4. 사용자 검색 실행
-    const result = await client.searchUsers(filters);
+    const { data, headers } = await client.searchUsers(filters);
 
-    // 5. 성공 응답 반환
-    return NextResponse.json(result, {
+    // 5. Rate Limit 헤더 추출
+    const rateLimitHeaders = GitHubApiClient.extractRateLimitHeaders({
+      headers,
+    } as any);
+
+    // 6. 성공 응답 반환 (헤더 포함)
+    return NextResponse.json(data, {
       status: 200,
       headers: {
         'Content-Type': 'application/json',
         'Cache-Control': 'no-store, max-age=0',
+        ...(rateLimitHeaders || {}),
       },
     });
   } catch (error) {

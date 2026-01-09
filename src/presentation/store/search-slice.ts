@@ -98,6 +98,7 @@ export const searchUsers = createAsyncThunk(
       const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
       const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
       const rateLimitReset = response.headers.get('X-RateLimit-Reset');
+      const rateLimitUsed = response.headers.get('X-RateLimit-Used');
 
       return {
         ...data,
@@ -106,6 +107,7 @@ export const searchUsers = createAsyncThunk(
               remaining: parseInt(rateLimitRemaining, 10),
               limit: rateLimitLimit ? parseInt(rateLimitLimit, 10) : 0,
               reset: rateLimitReset ? parseInt(rateLimitReset, 10) : 0,
+              used: rateLimitUsed ? parseInt(rateLimitUsed, 10) : 0,
             }
           : null,
       };
@@ -177,7 +179,23 @@ export const loadMoreUsers = createAsyncThunk(
       const data = await response.json();
       console.log('[loadMoreUsers] Loaded users:', data.users?.length);
 
-      return data;
+      // Rate Limit 헤더 추출
+      const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+      const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
+      const rateLimitReset = response.headers.get('X-RateLimit-Reset');
+      const rateLimitUsed = response.headers.get('X-RateLimit-Used');
+
+      return {
+        ...data,
+        rateLimitInfo: rateLimitRemaining
+          ? {
+              remaining: parseInt(rateLimitRemaining, 10),
+              limit: rateLimitLimit ? parseInt(rateLimitLimit, 10) : 0,
+              reset: rateLimitReset ? parseInt(rateLimitReset, 10) : 0,
+              used: rateLimitUsed ? parseInt(rateLimitUsed, 10) : 0,
+            }
+          : null,
+      };
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : 'Unknown error occurred'
@@ -340,6 +358,16 @@ const searchSlice = createSlice({
 
         // 실제 성공적으로 불러온 페이지 번호로 업데이트
         state.filters.page = action.payload.metadata.currentPage;
+
+        // Rate Limit 정보 업데이트
+        if (action.payload.rateLimitInfo) {
+          state.rateLimit = {
+            ...action.payload.rateLimitInfo,
+            used:
+              action.payload.rateLimitInfo.limit -
+              action.payload.rateLimitInfo.remaining,
+          };
+        }
       })
       .addCase(loadMoreUsers.rejected, (state, action) => {
         state.loading = false;

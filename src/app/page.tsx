@@ -16,7 +16,7 @@ export default async function Home() {
     // 1. 서버 사이드에서 초기 데이터 페칭 (예: "github" 검색 결과)
     const client = new GitHubApiClient();
     const initialQuery = 'github';
-    const result = await client.searchUsers({
+    const { data: result } = await client.searchUsers({
       query: initialQuery,
       page: 1,
       perPage: 30,

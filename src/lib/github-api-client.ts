@@ -44,7 +44,9 @@ export class GitHubApiClient {
   /**
    * 사용자 검색
    */
-  async searchUsers(filters: SearchFilters): Promise<SearchResult> {
+  async searchUsers(
+    filters: SearchFilters
+  ): Promise<{ data: SearchResult; headers: Headers }> {
     // 쿼리 빌더로 API 파라미터 생성
     const query = SearchQueryBuilder.build(filters);
 
@@ -60,29 +62,40 @@ export class GitHubApiClient {
     const url = `${this.baseUrl}/search/users?${params.toString()}`;
 
     // API 호출 (재시도 로직 포함)
-    const response = await this.fetchWithRetry<GitHubSearchResponse>(url);
+    const { data: apiResponse, headers } =
+      await this.fetchWithRetry<GitHubSearchResponse>(url);
 
     // Domain 엔티티로 변환
-    return GitHubApiMapper.toSearchResult(
-      response,
+    const result = GitHubApiMapper.toSearchResult(
+      apiResponse,
       query.page || 1,
       query.per_page || 30
     );
+
+    return { data: result, headers };
   }
 
   /**
    * Rate Limit 정보 조회
    */
-  async getRateLimit(): Promise<RateLimit> {
+  async getRateLimit(): Promise<{ data: RateLimit; headers: Headers }> {
     const url = `${this.baseUrl}/rate_limit`;
-    const response = await this.fetchWithRetry<GitHubRateLimitResponse>(url);
-    return GitHubApiMapper.toRateLimit(response);
+    const { data: apiResponse, headers } =
+      await this.fetchWithRetry<GitHubRateLimitResponse>(url);
+
+    return {
+      data: GitHubApiMapper.toRateLimit(apiResponse),
+      headers,
+    };
   }
 
   /**
    * Exponential Backoff를 적용한 재시도 로직
    */
-  private async fetchWithRetry<T>(url: string, retryCount = 0): Promise<T> {
+  private async fetchWithRetry<T>(
+    url: string,
+    retryCount = 0
+  ): Promise<{ data: T; headers: Headers }> {
     try {
       const response = await fetch(url, {
         headers: this.buildHeaders(),
@@ -121,8 +134,9 @@ export class GitHubApiClient {
         throw parseGitHubError(response, errorData);
       }
 
-      // 성공 응답
-      return await response.json();
+      // 성공 응답 (데이터와 헤더 모두 반환)
+      const data = await response.json();
+      return { data, headers: response.headers };
     } catch (error) {
       // ApiError는 그대로 throw
       if (error instanceof ApiError) {
