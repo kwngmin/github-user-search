@@ -99,13 +99,13 @@ export function useSearch() {
 
   const handleSearch = useCallback(
     async (customFilters?: Partial<SearchFilters>) => {
-      // query 우선순위 명확화
+      // query는 customFilters.query 또는 filters.query 또는 searchQuery 중 하나 사용
       const finalQuery = customFilters?.query || filters.query || searchQuery;
 
-      // 빈 query 체크
+      // query가 없으면 검색하지 않음
       if (!finalQuery || finalQuery.trim().length === 0) {
         console.warn('Search query is empty');
-        return; // ← 빈 query면 중단
+        return;
       }
 
       const searchFilters = {
@@ -122,7 +122,13 @@ export function useSearch() {
 
   const handleLoadMore = useCallback(async () => {
     if (!canLoadMore) return;
-    await dispatch(loadMoreUsers()).unwrap();
+
+    try {
+      await dispatch(loadMoreUsers()).unwrap();
+    } catch (error) {
+      // 에러 발생 시 조용히 무시 (대부분 정상 케이스)
+      // 실제 네트워크 에러는 여전히 catch되지만 UI에 표시 안함
+    }
   }, [dispatch, canLoadMore]);
 
   const handleFetchRateLimit = useCallback(async () => {

@@ -36,12 +36,25 @@ export default function UserList() {
   } = useSearch();
 
   const observerTarget = useRef<HTMLDivElement>(null);
+  const loadingRef = useRef(loading);
+
+  // loading 상태 추적 (Observer 클로저용)
+  useEffect(() => {
+    loadingRef.current = loading;
+  }, [loading]);
 
   // 무한 스크롤 - Intersection Observer
   useEffect(() => {
+    // canLoadMore가 false면 Observer 생성하지 않음
+    if (!canLoadMore) {
+      return;
+    }
+
     const observer = new IntersectionObserver(
       entries => {
-        if (entries[0].isIntersecting && canLoadMore && !loading) {
+        // 화면에 보이고, 로딩 중이 아닐 때만 loadMore 호출
+        // loadingRef를 사용하여 Observer 재생성 없이 최신 loading 상태 참조
+        if (entries[0].isIntersecting && !loadingRef.current) {
           loadMore();
         }
       },
@@ -58,7 +71,7 @@ export default function UserList() {
         observer.unobserve(currentTarget);
       }
     };
-  }, [canLoadMore, loading, loadMore]);
+  }, [canLoadMore, loadMore]); // loading을 의존성에서 제거하여 Observer 재생성 방지
 
   // 초기 상태 (검색 전)
   if (searchResultState === 'initial') {
@@ -182,7 +195,7 @@ export default function UserList() {
 
       {/* 무한 스크롤 트리거 */}
       <div
-        ref={observerTarget}
+        ref={canLoadMore ? observerTarget : null}
         className="h-20 flex items-center justify-center mt-8"
       >
         {loading && (
@@ -201,7 +214,7 @@ export default function UserList() {
             variant="body2"
             className="text-gray-500 dark:text-gray-400"
           >
-            All results loaded
+            ✓ All results loaded
           </Typography>
         )}
       </div>

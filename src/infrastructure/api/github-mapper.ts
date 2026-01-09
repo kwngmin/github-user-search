@@ -52,12 +52,44 @@ export class GitHubApiMapper {
   ): SearchResult {
     const users = apiResponse.items.map(item => this.toDomainUser(item));
 
+    // GitHub API 제한: 최대 1000개 결과만 접근 가능
+    const maxAccessibleResults = 1000;
+    const actualTotalCount = Math.min(
+      apiResponse.total_count,
+      maxAccessibleResults
+    );
+
+    // hasNextPage 계산
+    const hasNextPage =
+      apiResponse.items.length >= perPage &&
+      currentPage * perPage < actualTotalCount;
+
+    console.log('[GitHubApiMapper] ===== toSearchResult =====');
+    console.log('[GitHubApiMapper] currentPage:', currentPage);
+    console.log('[GitHubApiMapper] perPage:', perPage);
+    console.log('[GitHubApiMapper] items.length:', apiResponse.items.length);
+    console.log('[GitHubApiMapper] total_count:', apiResponse.total_count);
+    console.log('[GitHubApiMapper] actualTotalCount:', actualTotalCount);
+    console.log(
+      '[GitHubApiMapper] currentPage * perPage:',
+      currentPage * perPage
+    );
+    console.log(
+      '[GitHubApiMapper] Check 1 - items.length >= perPage:',
+      apiResponse.items.length >= perPage
+    );
+    console.log(
+      '[GitHubApiMapper] Check 2 - currentPage * perPage < actualTotalCount:',
+      currentPage * perPage < actualTotalCount
+    );
+    console.log('[GitHubApiMapper] hasNextPage:', hasNextPage);
+
     const metadata: SearchMetadata = {
       totalCount: apiResponse.total_count,
       incompleteResults: apiResponse.incomplete_results,
       currentPage,
       perPage,
-      hasNextPage: currentPage * perPage < apiResponse.total_count,
+      hasNextPage,
     };
 
     return {

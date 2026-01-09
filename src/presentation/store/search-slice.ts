@@ -88,6 +88,11 @@ export const searchUsers = createAsyncThunk(
 
       const data = await response.json();
       console.log('[searchUsers] Success, users count:', data.users?.length);
+      console.log('[searchUsers] Received metadata:', data.metadata);
+      console.log(
+        '[searchUsers] metadata.hasNextPage:',
+        data.metadata?.hasNextPage
+      );
 
       // Rate Limit 헤더 추출
       const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
@@ -143,12 +148,7 @@ export const loadMoreUsers = createAsyncThunk(
   'search/loadMoreUsers',
   async (_, { getState, rejectWithValue }) => {
     const state = getState() as { search: SearchState };
-    const { filters, hasMore, loading } = state.search;
-
-    // 이미 로딩 중이거나 더 이상 페이지가 없으면 중단
-    if (loading || !hasMore) {
-      return rejectWithValue('No more data or already loading');
-    }
+    const { filters } = state.search;
 
     // 다음 페이지 번호로 검색
     const nextPageFilters = {
@@ -157,6 +157,8 @@ export const loadMoreUsers = createAsyncThunk(
     };
 
     try {
+      console.log('[loadMoreUsers] Loading page:', nextPageFilters.page);
+
       const response = await fetch('/api/search/users', {
         method: 'POST',
         headers: {
@@ -172,12 +174,24 @@ export const loadMoreUsers = createAsyncThunk(
         );
       }
 
-      return await response.json();
+      const data = await response.json();
+      console.log('[loadMoreUsers] Loaded users:', data.users?.length);
+
+      return data;
     } catch (error) {
       return rejectWithValue(
         error instanceof Error ? error.message : 'Unknown error occurred'
       );
     }
+  },
+  {
+    // 이미 로딩 중이거나 더 이상 데이터가 없으면 실행하지 않음
+    condition: (_, { getState }) => {
+      const { search } = getState() as { search: SearchState };
+      if (search.loading || !search.hasMore) {
+        return false;
+      }
+    },
   }
 );
 
@@ -270,15 +284,28 @@ const searchSlice = createSlice({
         state.loading = false;
         state.isSearched = true;
 
-        // 첫 페이지면 교체, 아니면 추가 (무한 스크롤)
-        if (state.filters.page === 1) {
-          state.users = action.payload.users;
-        } else {
-          state.users = [...state.users, ...action.payload.users];
-        }
+        // searchUsers는 항상 새로운 검색이므로 기존 목록을 교체하고 페이지를 1로 초기화
+        state.users = action.payload.users;
+        state.filters.page = 1;
 
         state.metadata = action.payload.metadata;
         state.hasMore = action.payload.metadata.hasNextPage;
+
+        console.log('[searchUsers.fulfilled] Page reset to 1');
+        console.log(
+          '[searchUsers.fulfilled] Users received:',
+          action.payload.users.length
+        );
+        console.log('[searchUsers.fulfilled] Total users:', state.users.length);
+        console.log(
+          '[searchUsers.fulfilled] hasNextPage from API:',
+          action.payload.metadata.hasNextPage
+        );
+        console.log('[searchUsers.fulfilled] hasMore state:', state.hasMore);
+        console.log(
+          '[searchUsers.fulfilled] totalCount:',
+          action.payload.metadata.totalCount
+        );
 
         // Rate Limit 정보 업데이트
         if (action.payload.rateLimitInfo) {
@@ -311,13 +338,13 @@ const searchSlice = createSlice({
         state.metadata = action.payload.metadata;
         state.hasMore = action.payload.metadata.hasNextPage;
 
-        // 페이지 번호 증가
-        state.filters.page = (state.filters.page || 1) + 1;
+        // 실제 성공적으로 불러온 페이지 번호로 업데이트
+        state.filters.page = action.payload.metadata.currentPage;
       })
       .addCase(loadMoreUsers.rejected, (state, action) => {
         state.loading = false;
+        // 에러가 발생하더라도 hasMore를 false로 만들지 않음 (사용자가 재시도할 수 있도록)
         state.error = action.payload as string;
-        state.hasMore = false;
       });
 
     // fetchRateLimit 액션 처리
