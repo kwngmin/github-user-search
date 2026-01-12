@@ -362,7 +362,7 @@ describe('SearchQueryBuilder', () => {
 
       const result = SearchQueryBuilder.build(filters);
 
-      expect(result.q).toBe('javascript type:user location:Seoul repos:>=5');
+      expect(result.q).toBe('javascript type:user repos:>=5 location:Seoul');
     });
 
     it('서울의 TypeScript 개발자', () => {
@@ -378,7 +378,7 @@ describe('SearchQueryBuilder', () => {
       const result = SearchQueryBuilder.build(filters);
 
       expect(result.q).toBe(
-        'developer type:user location:Seoul language:TypeScript repos:>=10 followers:>=100'
+        'developer type:user repos:>=10 location:Seoul language:TypeScript followers:>=100'
       );
     });
   });
