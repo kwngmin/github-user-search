@@ -91,7 +91,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
           )}
 
           <Typography variant="h6" className="font-bold">
-            Filters
+            필터
           </Typography>
         </div>
         <Button
@@ -100,7 +100,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
           onClick={handleResetFilters}
           disabled={Object.keys(localFilters).length === 0}
         >
-          Reset
+          초기화
         </Button>
       </div>
 
@@ -109,11 +109,11 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 1. 사용자/조직 필터 */}
       <Accordion defaultExpanded>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">1. User Type</Typography>
+          <Typography className="font-semibold">1. 사용자/조직</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormControl fullWidth size="small">
-            <InputLabel>Type</InputLabel>
+            <InputLabel>유형</InputLabel>
             <Select
               value={localFilters.type || ''}
               label="Type"
@@ -129,10 +129,10 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
         </AccordionDetails>
       </Accordion>
 
-      {/* 2. 검색 대상 필드 */}
+      {/* 2. 검색 범위 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">2. Search In</Typography>
+          <Typography className="font-semibold">2. 검색 범위</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormGroup>
@@ -188,12 +188,12 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 3. 리포지토리 수 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">3. Repositories</Typography>
+          <Typography className="font-semibold">3. 리포지토리</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <div className="flex gap-2">
             <TextField
-              label="Min"
+              label="최소"
               type="number"
               size="small"
               fullWidth
@@ -207,7 +207,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
               inputProps={{ min: 0 }}
             />
             <TextField
-              label="Max"
+              label="최대"
               type="number"
               size="small"
               fullWidth
@@ -227,7 +227,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 4. 위치 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">4. Location</Typography>
+          <Typography className="font-semibold">4. 위치</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <TextField
@@ -244,7 +244,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 5. 언어 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">5. Language</Typography>
+          <Typography className="font-semibold">5. 사용 언어</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormControl fullWidth size="small">
@@ -272,7 +272,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 6. 가입일 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">6. Created Date</Typography>
+          <Typography className="font-semibold">6. 가입일</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <div className="flex gap-2">
@@ -311,12 +311,12 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 7. 팔로워 수 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">7. Followers</Typography>
+          <Typography className="font-semibold">7. 팔로워</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <div className="flex gap-2">
             <TextField
-              label="Min"
+              label="최소"
               type="number"
               size="small"
               fullWidth
@@ -330,7 +330,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
               inputProps={{ min: 0 }}
             />
             <TextField
-              label="Max"
+              label="최대"
               type="number"
               size="small"
               fullWidth
@@ -350,7 +350,7 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 8. 후원 가능 여부 */}
       <Accordion>
         <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography className="font-semibold">8. Sponsorable</Typography>
+          <Typography className="font-semibold">8. 후원 가능 여부</Typography>
         </AccordionSummary>
         <AccordionDetails>
           <FormControlLabel
@@ -362,19 +362,19 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
                 }
               />
             }
-            label="Only show sponsorable users"
+            label="후원 가능한 사용자만 보기"
           />
         </AccordionDetails>
       </Accordion>
 
       {/* 정렬 옵션 */}
       <Box className="mt-4">
-        <Typography variant="subtitle2" className="mb-2 font-semibold">
-          Sort By
+        <Typography variant="subtitle2" className="mb-4 font-medium">
+          정렬
         </Typography>
         <div className="flex gap-2 mb-2">
           <FormControl fullWidth size="small">
-            <InputLabel>Sort</InputLabel>
+            <InputLabel>기준</InputLabel>
             <Select
               value={localFilters.sort || 'best-match'}
               label="Sort"
@@ -382,14 +382,14 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
                 updateLocalFilter('sort', e.target.value as SortOption)
               }
             >
-              <MenuItem value="best-match">Best Match</MenuItem>
-              <MenuItem value="followers">Followers</MenuItem>
-              <MenuItem value="repositories">Repositories</MenuItem>
-              <MenuItem value="joined">Joined Date</MenuItem>
+              <MenuItem value="best-match">가장 적합한 순</MenuItem>
+              <MenuItem value="followers">팔로워 수</MenuItem>
+              <MenuItem value="repositories">리포지토리 수</MenuItem>
+              <MenuItem value="joined">가입일</MenuItem>
             </Select>
           </FormControl>
           <FormControl fullWidth size="small">
-            <InputLabel>Order</InputLabel>
+            <InputLabel>순서</InputLabel>
             <Select
               value={localFilters.sortOrder || 'desc'}
               label="Order"
@@ -397,8 +397,8 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
                 updateLocalFilter('sortOrder', e.target.value as SortOrder)
               }
             >
-              <MenuItem value="desc">Descending</MenuItem>
-              <MenuItem value="asc">Ascending</MenuItem>
+              <MenuItem value="desc">내림차순</MenuItem>
+              <MenuItem value="asc">오름차순</MenuItem>
             </Select>
           </FormControl>
         </div>
@@ -423,9 +423,10 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
           fontWeight: 'medium',
           height: 48,
           fontSize: '1rem',
+          paddingBottom: '0.625rem',
         }}
       >
-        Apply Filters
+        필터 적용
       </Button>
 
       {/* 활성화된 필터 표시 */}
@@ -435,20 +436,32 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
             variant="caption"
             className="text-gray-500 dark:text-gray-400 mb-2 block"
           >
-            Active Filters:
+            활성화된 필터:
           </Typography>
           <div className="flex flex-wrap gap-1">
             {localFilters.type && (
               <Chip
-                label={`Type: ${localFilters.type}`}
+                label={`유형: ${localFilters.type === 'user' ? '사용자' : '조직'}`}
                 size="small"
                 onDelete={() => updateLocalFilter('type', undefined)}
                 sx={{ paddingBottom: '1px' }}
               />
             )}
+            {localFilters.searchIn && localFilters.searchIn.length > 0 && (
+              <Chip
+                label={`검색 범위: ${localFilters.searchIn
+                  .map(f =>
+                    f === 'login' ? 'Username' : f === 'name' ? 'Name' : 'Email'
+                  )
+                  .join(', ')}`}
+                size="small"
+                onDelete={() => updateLocalFilter('searchIn', undefined)}
+                sx={{ paddingBottom: '1px' }}
+              />
+            )}
             {localFilters.location && (
               <Chip
-                label={`Location: ${localFilters.location}`}
+                label={`위치: ${localFilters.location}`}
                 size="small"
                 onDelete={() => updateLocalFilter('location', undefined)}
                 sx={{ paddingBottom: '1px' }}
@@ -456,25 +469,46 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
             )}
             {localFilters.language && (
               <Chip
-                label={`Language: ${localFilters.language}`}
+                label={`언어: ${localFilters.language}`}
                 size="small"
                 onDelete={() => updateLocalFilter('language', undefined)}
                 sx={{ paddingBottom: '1px' }}
               />
             )}
-            {localFilters.repos && (
+            {localFilters.repos &&
+              (localFilters.repos.min !== undefined ||
+                localFilters.repos.max !== undefined) && (
+                <Chip
+                  label={`리포지토리: ${localFilters.repos.min || 0}-${localFilters.repos.max || '∞'}`}
+                  size="small"
+                  onDelete={() => updateLocalFilter('repos', undefined)}
+                  sx={{ paddingBottom: '1px' }}
+                />
+              )}
+            {localFilters.created &&
+              (localFilters.created.from || localFilters.created.to) && (
+                <Chip
+                  label={`가입일: ${localFilters.created.from || '...'} ~ ${localFilters.created.to || '현재'}`}
+                  size="small"
+                  onDelete={() => updateLocalFilter('created', undefined)}
+                  sx={{ paddingBottom: '1px' }}
+                />
+              )}
+            {localFilters.followers &&
+              (localFilters.followers.min !== undefined ||
+                localFilters.followers.max !== undefined) && (
+                <Chip
+                  label={`팔로워: ${localFilters.followers.min || 0}-${localFilters.followers.max || '∞'}`}
+                  size="small"
+                  onDelete={() => updateLocalFilter('followers', undefined)}
+                  sx={{ paddingBottom: '1px' }}
+                />
+              )}
+            {localFilters.isSponsored && (
               <Chip
-                label={`Repos: ${localFilters.repos.min || 0}-${localFilters.repos.max || '∞'}`}
+                label="후원 가능"
                 size="small"
-                onDelete={() => updateLocalFilter('repos', undefined)}
-                sx={{ paddingBottom: '1px' }}
-              />
-            )}
-            {localFilters.followers && (
-              <Chip
-                label={`Followers: ${localFilters.followers.min || 0}-${localFilters.followers.max || '∞'}`}
-                size="small"
-                onDelete={() => updateLocalFilter('followers', undefined)}
+                onDelete={() => updateLocalFilter('isSponsored', undefined)}
                 sx={{ paddingBottom: '1px' }}
               />
             )}

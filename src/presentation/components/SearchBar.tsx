@@ -184,7 +184,7 @@ export default function SearchBar({
               paddingBottom: '0.625rem',
             }}
           >
-            {loading ? 'Searching...' : 'Search'}
+            {loading ? '검색 중...' : '검색'}
           </Button>
         )}
       </div>

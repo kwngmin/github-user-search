@@ -241,7 +241,7 @@ export default function UserCard({ user }: UserCardProps) {
                 variant="caption"
                 className="text-gray-600 dark:text-gray-400"
               >
-                Repositories
+                리포지토리
               </Typography>
             </Box>
           </Tooltip>
@@ -259,7 +259,7 @@ export default function UserCard({ user }: UserCardProps) {
                 variant="caption"
                 className="text-gray-600 dark:text-gray-400"
               >
-                Followers
+                팔로워
               </Typography>
             </Box>
           </Tooltip>
@@ -277,7 +277,7 @@ export default function UserCard({ user }: UserCardProps) {
                 variant="caption"
                 className="text-gray-600 dark:text-gray-400"
               >
-                Following
+                팔로잉
               </Typography>
             </Box>
           </Tooltip>
@@ -289,8 +289,8 @@ export default function UserCard({ user }: UserCardProps) {
             variant="caption"
             className="text-gray-500 dark:text-gray-500 mt-2 block text-center"
           >
-            Joined{' '}
-            {new Date(user.createdAt).toLocaleDateString('en-US', {
+            가입일:{' '}
+            {new Date(user.createdAt).toLocaleDateString('ko-KR', {
               year: 'numeric',
               month: 'short',
               day: 'numeric',
@@ -330,7 +330,7 @@ export default function UserCard({ user }: UserCardProps) {
             },
           }}
         >
-          View Profile
+          프로필 보기
         </Button>
       </CardActions>
     </Card>

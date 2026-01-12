@@ -48,7 +48,7 @@ export default function SearchPage() {
             color="text.secondary"
             className="text-sm md:text-base"
           >
-            Search and discover GitHub users with advanced filters
+            GitHub 사용자 검색 및 필터링 기능을 제공합니다.
           </Typography>
         </Box>
 
