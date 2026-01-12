@@ -15,18 +15,16 @@ import {
   CardActions,
   Typography,
   Chip,
-  Avatar,
   Box,
   Button,
   Tooltip,
-  IconButton,
+  useMediaQuery,
+  useTheme,
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import BusinessIcon from '@mui/icons-material/Business';
 import LinkIcon from '@mui/icons-material/Link';
 import EmailIcon from '@mui/icons-material/Email';
-import CodeIcon from '@mui/icons-material/Code';
-import PeopleIcon from '@mui/icons-material/People';
 import StarIcon from '@mui/icons-material/Star';
 import OpenInNewIcon from '@mui/icons-material/OpenInNew';
 import { GitHubUser } from '@/domain/entities/user';
@@ -37,6 +35,9 @@ interface UserCardProps {
 
 export default function UserCard({ user }: UserCardProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
 
   // Canvas로 아바타 이미지 렌더링
   useEffect(() => {
@@ -302,16 +303,18 @@ export default function UserCard({ user }: UserCardProps) {
       {/* 액션 버튼 */}
       <CardActions
         disableSpacing
-        className="p-0 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out absolute bottom-0 left-0 right-0 flex flex-col"
+        className={`p-0 flex flex-col ${!isMobile ? 'opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out absolute bottom-0 left-0 right-0' : ''}`}
       >
-        <Box
-          sx={{
-            width: '100%',
-            height: 96,
-            background: theme =>
-              `linear-gradient(to top, ${theme.palette.background.paper}, transparent)`,
-          }}
-        ></Box>
+        {!isMobile && (
+          <Box
+            sx={{
+              width: '100%',
+              height: 96,
+              background: theme =>
+                `linear-gradient(to top, ${theme.palette.background.paper}, transparent)`,
+            }}
+          ></Box>
+        )}
         <Button
           fullWidth
           variant="contained"
@@ -323,8 +326,9 @@ export default function UserCard({ user }: UserCardProps) {
             textTransform: 'none',
             borderRadius: 0,
             height: 48,
-            bgcolor: 'text.secondary',
+            bgcolor: isMobile ? 'text.primary' : 'text.secondary',
             color: 'background.paper',
+            paddingBottom: 1,
             '&:hover': {
               bgcolor: 'text.primary',
             },

@@ -38,7 +38,7 @@ export default function SearchPage() {
         <Box>
           <Typography
             variant="h3"
-            className="font-bold mb-2 text-2xl md:text-4xl"
+            className="font-bold mb-1 md:mb-2 text-2xl md:text-4xl"
             color="text.primary"
           >
             GitHub User Search
@@ -46,7 +46,7 @@ export default function SearchPage() {
           <Typography
             variant="body1"
             color="text.secondary"
-            className="text-sm md:text-base"
+            className="text-base md:text-xl break-keep"
           >
             GitHub 사용자 검색 및 필터링 기능을 제공합니다.
           </Typography>
@@ -65,6 +65,7 @@ export default function SearchPage() {
               bgcolor: 'action.hover',
             },
           }}
+          className={isMobile ? 'fixed bottom-3 right-2 z-10 shadow-lg' : ''}
         >
           {isDarkMode ? (
             <LightModeIcon className="text-yellow-400" />
