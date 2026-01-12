@@ -25,9 +25,13 @@ import { useSearch } from '@/presentation/store/use-search';
 
 interface SearchBarProps {
   onFilterToggle?: () => void;
+  isMobile?: boolean;
 }
 
-export default function SearchBar({ onFilterToggle }: SearchBarProps) {
+export default function SearchBar({
+  onFilterToggle,
+  isMobile,
+}: SearchBarProps) {
   const {
     searchQuery,
     loading,
@@ -68,15 +72,7 @@ export default function SearchBar({ onFilterToggle }: SearchBarProps) {
   };
 
   return (
-    <Paper
-      component="form"
-      onSubmit={handleSearch}
-      elevation={2}
-      className="p-4"
-      sx={{
-        borderRadius: 2,
-      }}
-    >
+    <Paper component="form" onSubmit={handleSearch} elevation={0}>
       <div className="flex gap-2">
         <TextField
           fullWidth
@@ -116,7 +112,7 @@ export default function SearchBar({ onFilterToggle }: SearchBarProps) {
         />
 
         {/* 필터 토글 버튼 */}
-        {onFilterToggle && (
+        {isMobile && onFilterToggle && (
           <Tooltip
             title={`Filters ${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}`}
           >
@@ -141,24 +137,54 @@ export default function SearchBar({ onFilterToggle }: SearchBarProps) {
         )}
 
         {/* 검색 버튼 */}
-        <Button
-          type="submit"
-          variant="contained"
-          size="large"
-          disabled={!canSearch}
-          startIcon={
-            loading ? (
-              <CircularProgress size={20} color="inherit" />
+        {isMobile ? (
+          <IconButton
+            type="submit"
+            size="large"
+            disabled={!canSearch}
+            sx={{
+              borderRadius: 1,
+              width: 56,
+              height: 56,
+              bgcolor: 'primary.main',
+              color: 'primary.contrastText',
+              '&:hover': {
+                bgcolor: 'primary.dark',
+              },
+              '&.Mui-disabled': {
+                bgcolor: 'action.disabledBackground',
+              },
+            }}
+          >
+            {loading ? (
+              <CircularProgress size={24} color="inherit" />
             ) : (
               <SearchIcon />
-            )
-          }
-          sx={{
-            minWidth: 120,
-          }}
-        >
-          {loading ? 'Searching...' : 'Search'}
-        </Button>
+            )}
+          </IconButton>
+        ) : (
+          <Button
+            type="submit"
+            variant="contained"
+            size="large"
+            disabled={!canSearch}
+            startIcon={
+              loading ? (
+                <CircularProgress size={20} color="inherit" />
+              ) : (
+                <SearchIcon />
+              )
+            }
+            sx={{
+              minWidth: 120,
+              height: 56,
+              textTransform: 'none',
+              fontWeight: 'bold',
+            }}
+          >
+            Search
+          </Button>
+        )}
       </div>
 
       {/* 검색 힌트 */}

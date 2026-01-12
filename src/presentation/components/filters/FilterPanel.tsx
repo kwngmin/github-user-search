@@ -402,6 +402,16 @@ export default function FilterPanel() {
         size="large"
         startIcon={<FilterAltIcon />}
         onClick={handleApplyFilters}
+        sx={{
+          bgcolor: 'text.primary',
+          color: 'background.paper',
+          '&:hover': {
+            bgcolor: 'text.secondary',
+            opacity: 0.9,
+          },
+          textTransform: 'none',
+          fontWeight: 'bold',
+        }}
       >
         Apply Filters
       </Button>

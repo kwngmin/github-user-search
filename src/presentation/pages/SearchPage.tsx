@@ -39,7 +39,7 @@ export default function SearchPage() {
         <Box>
           <Typography
             variant="h3"
-            className="font-bold mb-2"
+            className="font-bold mb-2 text-2xl md:text-4xl"
             color="text.primary"
           >
             GitHub User Search
@@ -47,6 +47,7 @@ export default function SearchPage() {
           <Typography
             variant="body1"
             color="text.secondary"
+            className="text-sm md:text-base"
           >
             Search and discover GitHub users with advanced filters
           </Typography>
@@ -79,7 +80,10 @@ export default function SearchPage() {
 
       {/* 검색바 */}
       <Box className="mb-6">
-        <SearchBar onFilterToggle={() => setFilterOpen(!filterOpen)} />
+        <SearchBar
+          onFilterToggle={() => setFilterOpen(!filterOpen)}
+          isMobile={isMobile}
+        />
       </Box>
 
       {/* 메인 레이아웃: Tailwind Grid */}

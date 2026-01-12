@@ -17,6 +17,7 @@ import {
   Chip,
   IconButton,
   Collapse,
+  Skeleton,
 } from '@mui/material';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
@@ -34,25 +35,44 @@ export default function RateLimitIndicator() {
     fetchRateLimit();
   }, [fetchRateLimit]);
 
-  // Rate Limit이 없으면 표시 안함
-  if (!rateLimit) return null;
-
-  // Rate Limit이 충분하면 표시 안함 (>50%)
-  if (rateLimitPercentage > 0.5 && open) {
+  // 로딩 중이거나 데이터가 없을 때 Skeleton 표시 (Layout Shift 방지)
+  if (!rateLimit) {
     return (
       <Box className="mb-4">
-        <Chip
-          icon={<InfoOutlinedIcon />}
-          label={`API: ${rateLimit.remaining}/${rateLimit.limit} requests remaining`}
-          size="small"
-          variant="outlined"
-          className="text-gray-600 dark:text-gray-400"
+        <Skeleton
+          variant="rounded"
+          height={24}
+          width={200}
+          sx={{ borderRadius: 16 }}
         />
       </Box>
     );
   }
 
-  // Rate Limit 경고 표시
+  // Rate Limit이 충분하면 표시 (Chip 형태)
+  if (rateLimitPercentage > 0.5 && open) {
+    return (
+      <Box className="mb-4">
+        {/* <Chip
+          icon={<InfoOutlinedIcon />}
+          label={`API: ${rateLimit.remaining}/${rateLimit.limit} requests remaining`}
+          size="small"
+          variant="outlined"
+          className="text-gray-600 dark:text-gray-400"
+        /> */}
+        <InfoOutlinedIcon
+          sx={{ fontSize: 18, marginRight: 0.5 }}
+          className="text-gray-700 dark:text-gray-400"
+        />
+        <Typography
+          variant="caption"
+          className="text-gray-500 dark:text-gray-400"
+        >{`API: ${rateLimit.remaining}/${rateLimit.limit} requests remaining`}</Typography>
+      </Box>
+    );
+  }
+
+  // Rate Limit 경고 표시 (Box 형태)
   const resetDate = new Date(rateLimit.reset * 1000);
   const resetTimeString = resetDate.toLocaleTimeString();
 

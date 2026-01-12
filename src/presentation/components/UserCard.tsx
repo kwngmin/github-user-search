@@ -323,6 +323,12 @@ export default function UserCard({ user }: UserCardProps) {
             textTransform: 'none',
             borderRadius: 0,
             height: 48,
+            bgcolor: 'text.primary',
+            color: 'background.paper',
+            '&:hover': {
+              bgcolor: 'text.secondary',
+              opacity: 0.9,
+            },
           }}
         >
           View Profile
