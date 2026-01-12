@@ -72,7 +72,7 @@ export default function SearchBar({ onFilterToggle }: SearchBarProps) {
       component="form"
       onSubmit={handleSearch}
       elevation={2}
-      className="p-4 bg-white dark:bg-gray-800"
+      className="p-4"
       sx={{
         borderRadius: 2,
       }}

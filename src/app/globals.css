@@ -1,23 +1,22 @@
 @layer theme, base, mui, components, utilities;
 @import 'tailwindcss';
 
+/* Tailwind v4 Dark Mode Selector */
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
 }
 
+.dark {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
 }
 
 /* 커스텀 스크롤바 (다크모드 지원) */
@@ -27,7 +26,7 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-gray-100 dark:bg-gray-800;
+  @apply bg-gray-100/50 dark:bg-gray-800/50;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -39,7 +38,14 @@
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  transition:
+    background-color 0.3s ease,
+    color 0.3s ease;
+}
+
+/* MUI 컴포넌트와 Tailwind 충돌 방지 */
+.MuiPaper-root {
+  @apply transition-colors duration-300;
 }

@@ -124,7 +124,7 @@ export default function UserList() {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {Array.from({ length: 12 }).map((_, index) => (
-          <Box key={index} className="p-4 bg-white dark:bg-gray-800 rounded-xl">
+          <Box key={index} className="p-4 rounded-xl">
             <div className="flex items-start gap-3 mb-3">
               <Skeleton variant="circular" width={80} height={80} />
               <div className="flex-1">
@@ -187,7 +187,7 @@ export default function UserList() {
       </Box>
 
       {/* 사용자 카드 그리드 - Tailwind CSS Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 items-start">
         {users.map(user => (
           <UserCard key={user.id} user={user} />
         ))}

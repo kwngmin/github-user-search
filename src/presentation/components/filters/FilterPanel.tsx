@@ -74,7 +74,7 @@ export default function FilterPanel() {
   };
 
   return (
-    <Paper elevation={2} className="p-4 bg-white dark:bg-gray-800">
+    <Paper elevation={0} sx={{ backgroundColor: 'transparent' }}>
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">

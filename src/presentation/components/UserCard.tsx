@@ -103,14 +103,15 @@ export default function UserCard({ user }: UserCardProps) {
 
   return (
     <Card
-      className="h-full hover:shadow-xl transition-all duration-300 bg-white dark:bg-gray-800"
+      className="h-full hover:border-gray-400 dark:hover:border-gray-500 transition-all duration-300 group relative"
+      variant="outlined"
       sx={{
         display: 'flex',
         flexDirection: 'column',
         borderRadius: 3,
       }}
     >
-      <CardContent className="flex-1">
+      <CardContent className="flex-1" sx={{ padding: 3 }}>
         {/* 헤더: 아바타 및 기본 정보 */}
         <div className="flex items-start gap-3 mb-3">
           <Box position="relative">
@@ -118,7 +119,7 @@ export default function UserCard({ user }: UserCardProps) {
               ref={canvasRef}
               width={80}
               height={80}
-              className="rounded-full border-2 border-gray-200 dark:border-gray-700"
+              className="rounded-full border border-gray-300 dark:border-gray-700"
               style={{ display: 'block' }}
             />
             {user.isSponsored && (
@@ -153,7 +154,17 @@ export default function UserCard({ user }: UserCardProps) {
               label={user.type}
               size="small"
               color={user.type === 'User' ? 'primary' : 'secondary'}
-              sx={{ mt: 0.5, height: 20, fontSize: '0.7rem' }}
+              // variant="outlined"
+              sx={{
+                mt: 1,
+                height: '1.25rem',
+                fontSize: '0.7rem',
+                display: 'flex',
+                alignItems: 'flex-start',
+                width: 'fit-content',
+                fontWeight: 'bold',
+                paddingTop: '1px',
+              }}
             />
           </div>
         </div>
@@ -186,7 +197,14 @@ export default function UserCard({ user }: UserCardProps) {
           {user.email && (
             <div className="flex items-center gap-1 text-sm text-gray-600 dark:text-gray-400">
               <EmailIcon sx={{ fontSize: 16 }} />
-              <Typography variant="caption" className="truncate">
+              <Typography
+                variant="caption"
+                className="truncate hover:underline cursor-pointer"
+                component="a"
+                href={`mailto:${user.email}`}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 {user.email}
               </Typography>
             </div>
@@ -216,30 +234,26 @@ export default function UserCard({ user }: UserCardProps) {
         <div className="grid grid-cols-3 gap-2 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
           <Tooltip title="Public Repositories">
             <Box className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <CodeIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              </div>
               <Typography variant="h6" className="font-bold text-sm">
-                {user.publicRepos}
+                {user.publicRepos !== undefined ? user.publicRepos : '-'}
               </Typography>
               <Typography
                 variant="caption"
                 className="text-gray-600 dark:text-gray-400"
               >
-                Repos
+                Repositories
               </Typography>
             </Box>
           </Tooltip>
 
           <Tooltip title="Followers">
             <Box className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              </div>
               <Typography variant="h6" className="font-bold text-sm">
-                {user.followers >= 1000
-                  ? `${(user.followers / 1000).toFixed(1)}k`
-                  : user.followers}
+                {user.followers !== undefined
+                  ? user.followers >= 1000
+                    ? `${(user.followers / 1000).toFixed(1)}k`
+                    : user.followers
+                  : '-'}
               </Typography>
               <Typography
                 variant="caption"
@@ -252,13 +266,12 @@ export default function UserCard({ user }: UserCardProps) {
 
           <Tooltip title="Following">
             <Box className="text-center">
-              <div className="flex items-center justify-center gap-1 mb-1">
-                <PeopleIcon sx={{ fontSize: 16, color: 'text.secondary' }} />
-              </div>
               <Typography variant="h6" className="font-bold text-sm">
-                {user.following >= 1000
-                  ? `${(user.following / 1000).toFixed(1)}k`
-                  : user.following}
+                {user.following !== undefined
+                  ? user.following >= 1000
+                    ? `${(user.following / 1000).toFixed(1)}k`
+                    : user.following
+                  : '-'}
               </Typography>
               <Typography
                 variant="caption"
@@ -271,21 +284,34 @@ export default function UserCard({ user }: UserCardProps) {
         </div>
 
         {/* 가입일 */}
-        <Typography
-          variant="caption"
-          className="text-gray-500 dark:text-gray-500 mt-2 block text-center"
-        >
-          Joined{' '}
-          {new Date(user.createdAt).toLocaleDateString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-          })}
-        </Typography>
+        {user.createdAt && (
+          <Typography
+            variant="caption"
+            className="text-gray-500 dark:text-gray-500 mt-2 block text-center"
+          >
+            Joined{' '}
+            {new Date(user.createdAt).toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric',
+            })}
+          </Typography>
+        )}
       </CardContent>
 
       {/* 액션 버튼 */}
-      <CardActions className="p-3 pt-0">
+      <CardActions
+        disableSpacing
+        className="p-0 opacity-0 group-hover:opacity-100 transition-all duration-300 ease-in-out absolute bottom-0 left-0 right-0 flex flex-col"
+      >
+        <Box
+          sx={{
+            width: '100%',
+            height: 96,
+            background: theme =>
+              `linear-gradient(to top, ${theme.palette.background.paper}, transparent)`,
+          }}
+        ></Box>
         <Button
           fullWidth
           variant="contained"
@@ -295,6 +321,8 @@ export default function UserCard({ user }: UserCardProps) {
           rel="noopener noreferrer"
           sx={{
             textTransform: 'none',
+            borderRadius: 0,
+            height: 48,
           }}
         >
           View Profile

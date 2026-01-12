@@ -75,11 +75,11 @@ export const lightTheme = createTheme({
       dark: '#7b1fa2',
     },
     background: {
-      default: '#f5f5f5',
+      default: '#ffffff',
       paper: '#ffffff',
     },
     text: {
-      primary: '#212121',
+      primary: '#171717',
       secondary: '#757575',
     },
   },
@@ -103,11 +103,11 @@ export const darkTheme = createTheme({
       dark: '#ab47bc',
     },
     background: {
-      default: '#121212',
+      default: '#0a0a0a',
       paper: '#1e1e1e',
     },
     text: {
-      primary: '#ffffff',
+      primary: '#ededed',
       secondary: '#b0b0b0',
     },
   },

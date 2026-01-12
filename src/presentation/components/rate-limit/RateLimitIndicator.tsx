@@ -64,7 +64,7 @@ export default function RateLimitIndicator() {
 
   return (
     <Collapse in={open}>
-      <Box className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative">
+      <Box className="mb-6 p-4 rounded-xl border border-gray-100 dark:border-gray-700 shadow-sm relative">
         <IconButton
           aria-label="close"
           size="small"

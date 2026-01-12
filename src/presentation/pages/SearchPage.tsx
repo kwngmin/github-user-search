@@ -18,32 +18,60 @@ import {
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import SearchBar from '@/presentation/components/SearchBar';
 import FilterPanel from '@/presentation/components/filters/FilterPanel';
 import UserList from '@/presentation/components/user/UserList';
 import RateLimitIndicator from '@/presentation/components/rate-limit/RateLimitIndicator';
+import { useThemeMode } from '@/lib/theme-provider';
 
 export default function SearchPage() {
   const [filterOpen, setFilterOpen] = useState(false);
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('lg'));
+  const { isDarkMode, toggleTheme } = useThemeMode();
 
   return (
     <Container maxWidth="xl" className="py-6">
       {/* 헤더 */}
-      <Box className="mb-6">
-        <Typography
-          variant="h3"
-          className="font-bold mb-2 text-gray-900 dark:text-white"
+      <Box className="mb-6 flex justify-between items-start">
+        <Box>
+          <Typography
+            variant="h3"
+            className="font-bold mb-2"
+            color="text.primary"
+          >
+            GitHub User Search
+          </Typography>
+          <Typography
+            variant="body1"
+            color="text.secondary"
+          >
+            Search and discover GitHub users with advanced filters
+          </Typography>
+        </Box>
+
+        <IconButton
+          onClick={toggleTheme}
+          color="inherit"
+          sx={{
+            p: 1.5,
+            borderRadius: 2,
+            border: '1px solid',
+            borderColor: 'divider',
+            bgcolor: 'background.paper',
+            '&:hover': {
+              bgcolor: 'action.hover',
+            },
+          }}
         >
-          GitHub User Search
-        </Typography>
-        <Typography
-          variant="body1"
-          className="text-gray-600 dark:text-gray-400"
-        >
-          Search and discover GitHub users with advanced filters
-        </Typography>
+          {isDarkMode ? (
+            <LightModeIcon className="text-yellow-400" />
+          ) : (
+            <DarkModeIcon className="text-gray-600" />
+          )}
+        </IconButton>
       </Box>
 
       {/* Rate Limit 표시 */}

@@ -7,8 +7,8 @@ const config: Config = {
     './src/app/**/*.{js,ts,jsx,tsx,mdx}',
     './src/presentation/**/*.{js,ts,jsx,tsx,mdx}',
   ],
-  // MUI와 충돌 방지를 위한 중요 설정
-  important: '#__next', // Tailwind 우선순위 조정
+  // MUI와 충돌 방지를 위한 설정 (필요 시 사용)
+  // important: true, 
   darkMode: 'class', // MUI dark 모드와 동기화
   theme: {
     extend: {

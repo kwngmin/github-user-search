@@ -12,6 +12,7 @@ import {
   GitHubSearchResponse,
   GitHubRateLimitResponse,
   GitHubApiError,
+  GitHubApiUser,
 } from '@/infrastructure/api/github-types';
 import { ApiError, parseGitHubError, getRequiredEnv } from './api-error';
 
@@ -61,13 +62,32 @@ export class GitHubApiClient {
 
     const url = `${this.baseUrl}/search/users?${params.toString()}`;
 
-    // API 호출 (재시도 로직 포함)
+    // 4. 사용자 검색 실행
     const { data: apiResponse, headers } =
       await this.fetchWithRetry<GitHubSearchResponse>(url);
 
-    // Domain 엔티티로 변환
+    // 5. 각 사용자의 상세 정보 추가 페칭 (public_repos, followers 등)
+    // Search API는 상세 정보를 제공하지 않으므로 병렬로 페칭합니다.
+    const detailedUsers = await Promise.all(
+      apiResponse.items.map(async user => {
+        try {
+          const userDetailUrl = `${this.baseUrl}/users/${user.login}`;
+          const { data: detailData } =
+            await this.fetchWithRetry<GitHubApiUser>(userDetailUrl);
+          return detailData;
+        } catch (error) {
+          console.error(
+            `Failed to fetch detail for user ${user.login}:`,
+            error
+          );
+          return user; // 실패 시 기본 정보라도 반환
+        }
+      })
+    );
+
+    // 6. Domain 엔티티로 변환
     const result = GitHubApiMapper.toSearchResult(
-      apiResponse,
+      { ...apiResponse, items: detailedUsers },
       query.page || 1,
       query.per_page || 30
     );
