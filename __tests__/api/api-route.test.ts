@@ -1,4 +1,8 @@
 /**
+ * @jest-environment node
+ */
+
+/**
  * API Route Handler 테스트
  * - POST /api/search/users 엔드포인트 테스트
  * - 입력 검증 테스트
@@ -6,6 +10,7 @@
  * - Rate Limit 헤더 테스트
  */
 
+import './setup-server-fetch';
 import { NextRequest } from 'next/server';
 import { POST, GET } from '@/app/api/search/users/route';
 import { GitHubApiClient } from '@/lib/github-api-client';

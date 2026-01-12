@@ -131,14 +131,14 @@ function validateSearchFilters(filters: SearchFilters): void {
 
   // 날짜 형식 검증
   if (filters.created) {
-    if (filters.created.from && !isValidDate(filters.created.from)) {
+    if (filters.created.from && !isValidIsoDate(filters.created.from)) {
       throw new ApiError(
         'Invalid date format for created.from (use YYYY-MM-DD)',
         400,
         'INVALID_DATE_FORMAT'
       );
     }
-    if (filters.created.to && !isValidDate(filters.created.to)) {
+    if (filters.created.to && !isValidIsoDate(filters.created.to)) {
       throw new ApiError(
         'Invalid date format for created.to (use YYYY-MM-DD)',
         400,
@@ -210,4 +210,22 @@ function isValidDate(dateString: string): boolean {
 
   const date = new Date(dateString);
   return date instanceof Date && !isNaN(date.getTime());
+}
+
+/**
+ * @param value YYYY-MM-DD
+ * @returns boolean
+ */
+export function isValidIsoDate(value: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) return false;
+
+  const [y, m, d] = value.split('-').map(Number);
+  const date = new Date(Date.UTC(y, m - 1, d));
+
+  // Date가 자동 보정하면(예: 2/30 -> 3/1) 다시 포맷이 달라짐
+  return (
+    date.getUTCFullYear() === y &&
+    date.getUTCMonth() === m - 1 &&
+    date.getUTCDate() === d
+  );
 }
