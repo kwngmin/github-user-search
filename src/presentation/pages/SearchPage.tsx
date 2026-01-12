@@ -17,7 +17,6 @@ import {
   useTheme,
   Typography,
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import SearchBar from '@/presentation/components/SearchBar';
@@ -111,17 +110,6 @@ export default function SearchPage() {
             }}
           >
             <Box className="p-4">
-              {/* <div className="flex items-center justify-between mb-4">
-                <Typography variant="h6" className="font-bold">
-                  Filters
-                </Typography>
-              </div> */}
-              {/* <IconButton
-                onClick={() => setFilterOpen(false)}
-                sx={{ position: 'absolute', top: 10, right: -40 }}
-              >
-                <CloseIcon sx={{ color: 'text.primary' }} />
-              </IconButton> */}
               <FilterPanel onClose={() => setFilterOpen(false)} />
             </Box>
           </Drawer>
