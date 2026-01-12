@@ -176,11 +176,11 @@ export default function UserList() {
           className="text-gray-700 dark:text-gray-300"
         >
           검색 결과{' '}
-          <strong>{paginationInfo.totalCount.toLocaleString()}</strong>
+          <strong>{paginationInfo.currentCount.toLocaleString()}</strong>
           {paginationInfo.totalCount > paginationInfo.currentCount && (
             <span className="text-gray-500 dark:text-gray-400 text-sm">
               {' '}
-              ({paginationInfo.currentCount.toLocaleString()}개씩 보기)
+              /{paginationInfo.totalCount.toLocaleString()}
             </span>
           )}
         </Typography>
