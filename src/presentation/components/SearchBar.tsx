@@ -74,6 +74,34 @@ export default function SearchBar({
   return (
     <Paper component="form" onSubmit={handleSearch} elevation={0}>
       <div className="flex gap-2">
+        {/* 필터 토글 버튼 */}
+        {isMobile && onFilterToggle && (
+          <Tooltip
+            title={`Filters ${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}`}
+          >
+            <IconButton
+              onClick={onFilterToggle}
+              size="large"
+              disabled={loading}
+              className="xl:hidden"
+              sx={{
+                borderRadius: 1,
+                width: 56,
+                height: 56,
+                // bgcolor: 'action.hover',
+                position: 'relative',
+              }}
+            >
+              <FilterListIcon />
+              {activeFiltersCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                  {activeFiltersCount}
+                </span>
+              )}
+            </IconButton>
+          </Tooltip>
+        )}
+
         <TextField
           fullWidth
           value={searchQuery}
@@ -105,36 +133,15 @@ export default function SearchBar({
             ),
           }}
           sx={{
+            '& input': {
+              borderRadius: '0 !important',
+              paddingLeft: 1,
+            },
             '& .MuiOutlinedInput-root': {
               backgroundColor: 'background.paper',
             },
           }}
         />
-
-        {/* 필터 토글 버튼 */}
-        {isMobile && onFilterToggle && (
-          <Tooltip
-            title={`Filters ${activeFiltersCount > 0 ? `(${activeFiltersCount})` : ''}`}
-          >
-            <Button
-              onClick={onFilterToggle}
-              variant={activeFiltersCount > 0 ? 'contained' : 'outlined'}
-              size="large"
-              disabled={loading}
-              sx={{
-                minWidth: 60,
-                position: 'relative',
-              }}
-            >
-              <FilterListIcon />
-              {activeFiltersCount > 0 && (
-                <span className="absolute -top-1 -right-1 bg-primary-main text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
-                  {activeFiltersCount}
-                </span>
-              )}
-            </Button>
-          </Tooltip>
-        )}
 
         {/* 검색 버튼 */}
         {isMobile ? (

@@ -323,11 +323,10 @@ export default function UserCard({ user }: UserCardProps) {
             textTransform: 'none',
             borderRadius: 0,
             height: 48,
-            bgcolor: 'text.primary',
+            bgcolor: 'text.secondary',
             color: 'background.paper',
             '&:hover': {
-              bgcolor: 'text.secondary',
-              opacity: 0.9,
+              bgcolor: 'text.primary',
             },
           }}
         >

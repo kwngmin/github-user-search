@@ -99,8 +99,8 @@ export function useSearch() {
 
   const handleSearch = useCallback(
     async (customFilters?: Partial<SearchFilters>) => {
-      // query는 customFilters.query 또는 filters.query 또는 searchQuery 중 하나 사용
-      const finalQuery = customFilters?.query || filters.query || searchQuery;
+      // query는 1. customFilters.query, 2. searchQuery, 3. filters.query 순으로 우선순위 결정
+      const finalQuery = customFilters?.query || searchQuery || filters.query;
 
       // query가 없으면 검색하지 않음
       if (!finalQuery || finalQuery.trim().length === 0) {
@@ -108,7 +108,7 @@ export function useSearch() {
         return;
       }
 
-      const searchFilters = {
+      const searchFilters: SearchFilters = {
         ...filters,
         ...customFilters,
         query: finalQuery,

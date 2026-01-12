@@ -26,9 +26,11 @@ import {
   Typography,
   Divider,
   Box,
+  IconButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import FilterAltIcon from '@mui/icons-material/FilterAlt';
+import CloseIcon from '@mui/icons-material/Close';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useSearch } from '@/presentation/store/use-search';
 import {
@@ -39,12 +41,17 @@ import {
   SortOrder,
 } from '@/domain/types/filters';
 
-export default function FilterPanel() {
+export default function FilterPanel({ onClose }: { onClose?: () => void }) {
   const { filters, updateFilters, resetSearch, search } = useSearch();
 
   // 로컬 상태 (Apply 버튼 누를 때까지 임시 저장)
   const [localFilters, setLocalFilters] =
     useState<Partial<SearchFilters>>(filters);
+
+  // Redux filters가 변경되면 로컬 필터도 동기화 (예: 검색창에서 검색어 입력 시)
+  React.useEffect(() => {
+    setLocalFilters(filters);
+  }, [filters]);
 
   const handleApplyFilters = async () => {
     console.log('[FilterPanel] Apply filters:', localFilters);
@@ -78,7 +85,14 @@ export default function FilterPanel() {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          <FilterAltIcon className="text-primary" />
+          {onClose ? (
+            <IconButton onClick={onClose}>
+              <CloseIcon fontSize="small" />
+            </IconButton>
+          ) : (
+            <FilterAltIcon className="text-primary" />
+          )}
+
           <Typography variant="h6" className="font-bold">
             Filters
           </Typography>
@@ -406,7 +420,7 @@ export default function FilterPanel() {
           bgcolor: 'text.primary',
           color: 'background.paper',
           '&:hover': {
-            bgcolor: 'text.secondary',
+            color: 'background.paper',
             opacity: 0.9,
           },
           textTransform: 'none',
@@ -431,6 +445,7 @@ export default function FilterPanel() {
                 label={`Type: ${localFilters.type}`}
                 size="small"
                 onDelete={() => updateLocalFilter('type', undefined)}
+                sx={{ paddingBottom: '1px' }}
               />
             )}
             {localFilters.location && (
@@ -438,6 +453,7 @@ export default function FilterPanel() {
                 label={`Location: ${localFilters.location}`}
                 size="small"
                 onDelete={() => updateLocalFilter('location', undefined)}
+                sx={{ paddingBottom: '1px' }}
               />
             )}
             {localFilters.language && (
@@ -445,6 +461,7 @@ export default function FilterPanel() {
                 label={`Language: ${localFilters.language}`}
                 size="small"
                 onDelete={() => updateLocalFilter('language', undefined)}
+                sx={{ paddingBottom: '1px' }}
               />
             )}
             {localFilters.repos && (
@@ -452,6 +469,7 @@ export default function FilterPanel() {
                 label={`Repos: ${localFilters.repos.min || 0}-${localFilters.repos.max || '∞'}`}
                 size="small"
                 onDelete={() => updateLocalFilter('repos', undefined)}
+                sx={{ paddingBottom: '1px' }}
               />
             )}
             {localFilters.followers && (
@@ -459,6 +477,7 @@ export default function FilterPanel() {
                 label={`Followers: ${localFilters.followers.min || 0}-${localFilters.followers.max || '∞'}`}
                 size="small"
                 onDelete={() => updateLocalFilter('followers', undefined)}
+                sx={{ paddingBottom: '1px' }}
               />
             )}
           </div>

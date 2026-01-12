@@ -231,12 +231,18 @@ const searchSlice = createSlice({
     updateFilters: (state, action: PayloadAction<Partial<SearchFilters>>) => {
       state.filters = { ...state.filters, ...action.payload };
 
+      // query가 포함되어 있으면 searchQuery도 함께 업데이트 (동기화)
+      if (action.payload.query !== undefined) {
+        state.searchQuery = action.payload.query;
+      }
+
       // 새로운 검색이면 페이지 초기화
       if (
         action.payload.query !== undefined ||
         action.payload.type !== undefined ||
         action.payload.sort !== undefined ||
-        action.payload.sortOrder !== undefined
+        action.payload.sortOrder !== undefined ||
+        action.payload.isSponsored !== undefined
       ) {
         state.filters.page = 1;
         state.users = [];

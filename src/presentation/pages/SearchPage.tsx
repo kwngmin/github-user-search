@@ -111,21 +111,24 @@ export default function SearchPage() {
             }}
           >
             <Box className="p-4">
-              <div className="flex items-center justify-between mb-4">
+              {/* <div className="flex items-center justify-between mb-4">
                 <Typography variant="h6" className="font-bold">
                   Filters
                 </Typography>
-                <IconButton onClick={() => setFilterOpen(false)}>
-                  <CloseIcon />
-                </IconButton>
-              </div>
-              <FilterPanel />
+              </div> */}
+              {/* <IconButton
+                onClick={() => setFilterOpen(false)}
+                sx={{ position: 'absolute', top: 10, right: -40 }}
+              >
+                <CloseIcon sx={{ color: 'text.primary' }} />
+              </IconButton> */}
+              <FilterPanel onClose={() => setFilterOpen(false)} />
             </Box>
           </Drawer>
         )}
 
         {/* 사용자 목록 */}
-        <main className="lg:col-span-3">
+        <main className={isMobile ? 'col-span-4' : 'lg:col-span-3'}>
           <UserList />
         </main>
       </div>

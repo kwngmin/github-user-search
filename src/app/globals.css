@@ -37,6 +37,10 @@
   @apply bg-gray-500 dark:bg-gray-500;
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   background-color: var(--background);
   color: var(--foreground);
