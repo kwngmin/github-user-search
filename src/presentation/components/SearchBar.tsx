@@ -88,7 +88,7 @@ export default function SearchBar({
                 borderRadius: 1,
                 width: 56,
                 height: 56,
-                // bgcolor: 'action.hover',
+                bgcolor: 'action.hover',
                 position: 'relative',
               }}
             >
@@ -112,7 +112,7 @@ export default function SearchBar({
           size="medium"
           disabled={loading}
           InputProps={{
-            startAdornment: (
+            startAdornment: !isMobile && (
               <InputAdornment position="start">
                 <SearchIcon className="text-gray-400" />
               </InputAdornment>
@@ -135,7 +135,7 @@ export default function SearchBar({
           sx={{
             '& input': {
               borderRadius: '0 !important',
-              paddingLeft: 1,
+              paddingLeft: isMobile ? 2 : 1,
             },
             '& .MuiOutlinedInput-root': {
               backgroundColor: 'background.paper',
@@ -175,21 +175,16 @@ export default function SearchBar({
             variant="contained"
             size="large"
             disabled={!canSearch}
-            startIcon={
-              loading ? (
-                <CircularProgress size={20} color="inherit" />
-              ) : (
-                <SearchIcon />
-              )
-            }
             sx={{
-              minWidth: 120,
+              minWidth: 160,
               height: 56,
               textTransform: 'none',
-              fontWeight: 'bold',
+              fontWeight: 'semibold',
+              fontSize: '1.125rem',
+              paddingBottom: '0.625rem',
             }}
           >
-            Search
+            {loading ? 'Searching...' : 'Search'}
           </Button>
         )}
       </div>

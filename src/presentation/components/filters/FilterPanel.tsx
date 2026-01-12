@@ -29,7 +29,6 @@ import {
   IconButton,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import FilterAltIcon from '@mui/icons-material/FilterAlt';
 import CloseIcon from '@mui/icons-material/Close';
 import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import { useSearch } from '@/presentation/store/use-search';
@@ -85,12 +84,10 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
       {/* 헤더 */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
-          {onClose ? (
+          {onClose && (
             <IconButton onClick={onClose}>
               <CloseIcon fontSize="small" />
             </IconButton>
-          ) : (
-            <FilterAltIcon className="text-primary" />
           )}
 
           <Typography variant="h6" className="font-bold">
@@ -414,7 +411,6 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
         variant="contained"
         fullWidth
         size="large"
-        startIcon={<FilterAltIcon />}
         onClick={handleApplyFilters}
         sx={{
           bgcolor: 'text.primary',
@@ -424,7 +420,9 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
             opacity: 0.9,
           },
           textTransform: 'none',
-          fontWeight: 'bold',
+          fontWeight: 'medium',
+          height: 48,
+          fontSize: '1rem',
         }}
       >
         Apply Filters
