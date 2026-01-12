@@ -68,8 +68,10 @@ export default function FilterPanel({ onClose }: { onClose?: () => void }) {
   };
 
   const handleResetFilters = () => {
-    setLocalFilters({});
+    console.log('[FilterPanel] Resetting filters');
+    // Redux 필터를 먼저 초기화 (검색어는 유지)
     resetSearch();
+    // useEffect가 자동으로 localFilters를 동기화함
   };
 
   const updateLocalFilter = <K extends keyof SearchFilters>(

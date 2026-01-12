@@ -272,14 +272,28 @@ const searchSlice = createSlice({
       state.hasMore = true;
     },
 
-    // 검색 초기화
+    // 검색 초기화 (필터 초기화, 검색어는 유지)
     resetSearch: state => {
+      const currentQuery = state.filters.query;
+      const currentSearchQuery = state.searchQuery;
+
       state.users = [];
       state.metadata = null;
       state.error = null;
       state.hasMore = true;
-      state.filters.page = 1;
       state.isSearched = false;
+
+      // 필터를 초기값으로 리셋하되 검색어는 유지
+      state.filters = {
+        query: currentQuery,
+        page: 1,
+        perPage: 30,
+        sort: 'best-match',
+        sortOrder: 'desc',
+      };
+
+      // searchQuery도 동기화
+      state.searchQuery = currentSearchQuery;
     },
 
     // 전체 상태 초기화 (검색어 포함)
